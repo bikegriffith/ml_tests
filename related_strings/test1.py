@@ -10,7 +10,7 @@ Given an initial subject profile:
 
 And some sample datasets that might belong to the subject:
     datasets = [
-        {name: 'Bob J', age: '31', relatives: ['Mary Jones'], locations: ['Akron, OH', 'Dover, OH']},
+        {name: 'Bob J', age: '32', relatives: ['Mary Jones'], locations: ['Akron, OH', 'Dover, OH']},
         {name: 'Bob Jones', age: '33', relatives: [], locations: ['Dover, OH']},
         {name: 'Bob James', age: 21, relatives: ['Paul Foo'], locations: ['Atlanda, GA']}
     ]
@@ -25,10 +25,30 @@ information?
 
 """
 
-class Test(object):
+import apriori
+
+class TestAprioriAlgorithm(object):
 
     def setup(self):
-        pass
+        self.dataset = [
+            # Columns:
+            # 1: Count of total matches      2-N: additional bits of data prefixed
+            #    from original profile            with the type of data
+            #    allowing for some slop
+            (3, 'name:Bob J', 'relative:Mary Jones', 'location:Dover, OH'),
+            (2, 'name:Bob J', 'relative:Mary Jones', 'location:Dover, OH'),
+            (0, 'name:Bob James', 'age:21', 'relative:Paul Foo', 'location:Atlanta, GA'),
+        ]
 
-    def teardown(self):
-        pass
+    def test_generate_associations(self):
+        L, supp_data = apriori.apriori(self.dataset, min_support=0.5)
+        print 'L:', L
+        print '-'*20
+        print 'supp_data: ', supp_data
+        print '-'*20
+        rules = apriori.generateRules(L, supp_data, min_confidence=0.95)
+        print '-'*20
+        print 'rules: ', rules
+        print '-'*20
+        assert False
+
